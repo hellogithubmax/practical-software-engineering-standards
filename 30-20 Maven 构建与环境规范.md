@@ -5,17 +5,24 @@
 <a id="maven-environment-profiles"></a>
 ## 1. 环境 Profile
 
-在 `pom.xml` 中提供 `dev`、`inte`、`prod` 三个环境 Profile。每次选择一个环境 Profile。安全扫描等独立的构建 Profile 可以与环境 Profile 一起使用。
+使用 Maven 构建并运行的应用必须在 POM 中定义可用的 `dev` Profile。可以预留 `test`、`inte`、`prod` Profile 及对应的 YAML，配置内容可先为空。各环境的用途和启用条件见[通用环境配置](<10-10 通用开发规范.md#environment-yaml>)。
 
-| Maven 选项 | 用途 | 运行要求 |
-| --- | --- | --- |
-| `-Pdev` | 本地开发与调试 | 使用开发环境配置。提供支持资源刷新和代码自动重载的开发启动入口。 |
-| `-Pinte` | 集成测试与联调 | 使用独立的集成环境配置，通过打包后的资源验证应用。 |
-| `-Pprod` | 生产发布 | 部署时显式选择生产运行环境，使用已验收的制品和生产配置。生产环境关闭源码目录读取和开发热重载。 |
+- **一次选择一个环境。** Maven 环境 Profile 明确对应运行环境及配置位置。例如 `-Pdev` 对应开发环境的 `application-dev.yml`。按环境目录组织时，写清 Profile 对应哪个目录。安全扫描等独立构建 Profile 可以与环境 Profile 同时使用。
+- **本地开发可以默认 dev。** 打开发包时显式执行 `mvn -Pdev package`。提供 Maven Wrapper 的项目使用 `./mvnw -Pdev package`，Windows PowerShell 下使用 `.mvnw.cmd -Pdev package`。针对具体环境的持续集成和发布任务应明确指定目标。选了多个环境，或指定的环境尚未启用时，应报错。
+- **构建与运行的环境选择一致。** 制品已在构建时选定环境的，IDE、脚本和直接运行的入口都沿用该环境，显式指定的环境与制品冲突时报错。同一制品跨环境部署时，由部署入口显式选定目标环境并核对实际生效结果。使用 Spring Boot 时，说明 Maven Profile 对应的 Spring Profile。
+- **自动化测试单独准备运行条件。** `-Ptest` 选择可部署的测试环境，`mvn test` 执行构建中的测试阶段。自动化测试按自己的约定准备测试数据和依赖服务。
+- **开发数据库的选择归 dev 配置。** 共享库和个人本地库默认沿用 `dev` Profile。需要分别打包开发配置时，可以使用明确的构建变体，两种方式仍属于同一开发环境。连接管理见[开发数据库](<10-10 通用开发规范.md#development-database>)。
 
-**打开发包时显式选用 `dev` Profile**，执行 `mvn -Pdev package`。项目提供 Maven Wrapper 时，使用 `./mvnw -Pdev package`，Windows PowerShell 下使用 `.\mvnw.cmd -Pdev package`。
+<a id="pom-readability"></a>
+### 1.1 POM 的可读性
 
-Maven 的 `-P` 选择构建配置。通过 Maven 启动应用时，按[通用环境配置](<10-10 通用开发规范.md#environment-yaml>)传入同名运行环境。以 Spring Boot 为例，启动入口将选中的 Maven 环境 Profile 映射到同名 Spring Profile。运行已打包的 JAR 时，通过 `SPRING_PROFILES_ACTIVE` 或 `--spring.profiles.active` 选择环境。运行所需的环境配置缺失时应明确报错。集成验收和生产优先使用同一构建产物，环境差异由启动配置注入。
+POM 沿用[通用配置组织规则](<10-10 通用开发规范.md#readable-project-structure>)。阅读一个环境 Profile 时，应能顺着定义找到它改变的配置和生效位置。例如，多个环境互斥时，校验条件要能直接看出允许的选择，错误提示要说明冲突和修正办法。
+
+<a id="maven-packaged-configuration"></a>
+### 1.2 配置打包与验证
+
+- **明确复制和打包范围。** 按交付方式声明哪些配置进入编译输出和最终制品。构建产物绑定单个环境时，只打包该环境和共用的资源。私有配置与样例同目录时，按文件范围选择允许发布的配置，并在最终制品中核对敏感文件、仅供参考的样例和旧输出均未混入。
+- **按真实入口核对结果。** 检查实际资源输出及最终 JAR 或 WAR，使用嵌套配置包时也检查其内容。调整配置打包规则时，按环境打包且支持增量构建的项目，验证切换环境后重新打包，确认旧环境资源没有残留。通过实际启动入口核对生效的配置。验证文件排除规则时可使用模拟私有文件。涉及路径或入口迁移时，沿用[通用迁移要求](<10-10 通用开发规范.md#configuration-migration>)。
 
 <a id="maven-dev-resources"></a>
 ## 2. dev 开发时自动更新
