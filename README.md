@@ -21,7 +21,7 @@ Practical Software Engineering Standards
 | `20` 开发协作 | [协作开发规范](<20-20 协作开发规范.md>) | 多人开工同步、任务记录、评审和交接 |
 | `30` Java | [Java 通用代码规范](<30-10 Java 通用代码规范.md>) | Java 命名、业务与页面目录、注释和排版 |
 | `30` Java | [Maven 构建与环境规范](<30-20 Maven 构建与环境规范.md>) | 使用 Maven 构建和运行的 Java 应用 |
-| `30` Java | [ORM 编码规范](<30-40 ORM 编码规范.md>) | 采用MyBatis-Plus的Java项目 |
+| `30` Java | [ORM 编码规范](<30-40 ORM 编码规范.md>) | Java ORM 选型与 MyBatis 数据访问 |
 | `40` 数据库 | [数据库设计规范](<40-10 数据库设计规范.md>) | MySQL 主键、字段类型与容量设计 |
 | `50` 前端 | [前端开发规范](<50-10 前端开发规范.md>) | Web页面、模板、样式和客户端交互 |
 | `60` 接口 | [JSON接口规范](<60-10 JSON接口规范.md>) | 使用JSON交换数据的接口 |
