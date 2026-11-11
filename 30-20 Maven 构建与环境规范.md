@@ -40,4 +40,11 @@ POM 沿用[通用配置组织规则](<10-10 通用开发规范.md#readable-proje
 - Controller。保存一处已有方法的返回值修改，再保存一处路由变更。分别通过 HTTP 验证新行为，期间无需手工编译、打包或重启。
 - 集成和生产。确认实际加载的是随包发布的资源，开发时的自动更新只在 dev 开发入口启用。
 
+<a id="maven-lombok"></a>
+## 3. Lombok 编译配置
+
+- 在用到 Lombok 的模块声明编译期依赖。Maven 使用 `provided`，由父 POM 或 BOM 统一管理版本。编译器配置明确声明 Lombok 注解处理器，命令行和 IDE 编译使用同一份模块配置。
+- 验证实际 Maven 编译是否生成所需方法。涉及打包时检查最终 JAR 或 WAR。Spring Boot 重打包可能纳入 `provided` 依赖，使用相应排除项，确保 Lombok 留在编译期。
+- 源码中的注解用法见 [Java 的 Lombok 约定](<30-10 Java 通用代码规范.md#java-lombok>)。配置细节见 [Lombok Maven 说明](https://projectlombok.org/setup/maven)及 [Spring Boot 打包说明](https://docs.spring.io/spring-boot/maven-plugin/packaging.html)。
+
 参考 [Maven Build Profiles](https://maven.apache.org/guides/introduction/introduction-to-profiles.html)、[Spring Boot Profiles](https://docs.spring.io/spring-boot/reference/features/profiles.html) 和 [Spring Boot Maven 插件运行选项](https://docs.spring.io/spring-boot/maven-plugin/run.html)。
