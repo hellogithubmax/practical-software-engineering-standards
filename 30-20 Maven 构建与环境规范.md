@@ -1,15 +1,15 @@
 # Maven 构建与环境规范
 
-适用于使用 Maven 构建并运行的 Java 应用。页面资源刷新要求适用于由 Java 应用提供模板或静态资源的 Web 项目。环境的 YAML 命名和配置分离沿用[通用环境配置](<10-10 通用开发规范.md#51-环境配置>)。
+适用于使用 Maven 构建并运行的 Java 应用。页面资源刷新要求适用于由 Java 应用提供模板或静态资源的 Web 项目。
 
 <a id="maven-environment-profiles"></a>
 
 ## 1. 环境 Profile
 
-使用 Maven 构建并运行的应用必须在 POM 中定义可用的 `dev` Profile。可以预留 `test`、`inte`、`prod` Profile 及对应的 YAML，配置内容可先为空。各环境的用途和启用条件见[通用环境配置](<10-10 通用开发规范.md#51-环境配置>)。
+使用 Maven 构建并运行的应用必须在 POM 中定义可用的 `dev` Profile。可以预留 `test`、`inte`、`prod` Profile 及对应的 YAML，配置内容可先为空。各环境的用途、启用条件及 YAML 配置约定见[通用环境配置](<10-10 通用开发规范.md#51-环境配置>)。
 
 - **一次选择一个环境。** Maven 环境 Profile 明确对应运行环境及配置位置。例如 `-Pdev` 对应开发环境的 `application-dev.yml`。按环境目录组织时，写清 Profile 对应哪个目录。安全扫描等独立构建 Profile 可以与环境 Profile 同时使用。
-- **本地开发可以默认 dev。** 打开发包时显式执行 `mvn -Pdev package`。提供 Maven Wrapper 的项目使用 `./mvnw -Pdev package`，Windows PowerShell 下使用 `.mvnw.cmd -Pdev package`。针对具体环境的持续集成和发布任务应明确指定目标。选了多个环境，或指定的环境尚未启用时，应报错。
+- **本地开发可以默认 dev。** 构建开发环境制品时显式执行 `mvn -Pdev package`。提供 Maven Wrapper 的项目使用 `./mvnw -Pdev package`，Windows PowerShell 下使用 `.\mvnw.cmd -Pdev package`。针对具体环境的持续集成和发布任务应明确指定目标。选了多个环境，或指定的环境尚未启用时，应报错。
 - **构建与运行的环境选择一致。** 制品已在构建时选定环境的，IDE、脚本和直接运行的入口都沿用该环境，显式指定的环境与制品冲突时报错。同一制品跨环境部署时，由部署入口显式选定目标环境并核对实际生效结果。使用 Spring Boot 时，说明 Maven Profile 对应的 Spring Profile。
 - **自动化测试单独准备运行条件。** `-Ptest` 选择可部署的测试环境，`mvn test` 执行构建中的测试阶段。自动化测试按自己的约定准备测试数据和依赖服务。
 - **开发数据库的选择归 dev 配置。** 共享库和个人本地库默认沿用 `dev` Profile。需要分别打包开发配置时，可以使用明确的构建变体，两种方式仍属于同一开发环境。连接管理见[开发数据库](<10-10 通用开发规范.md#53-开发数据库>)。
@@ -31,7 +31,7 @@ POM 沿用[通用配置组织规则](<10-10 通用开发规范.md#24-配置与�
 
 ## 2. dev 开发时自动更新
 
-`dev` 的开发启动配置应减少每次修改后的手工操作。启动一次后，保存源码即可继续调试。项目应提供明确的启动命令或可复用的 IDE 配置。
+项目应提供明确的 dev 启动命令或可复用的 IDE 配置。
 
 - 修改 HTML 模板、CSS 或 JavaScript 后，**保存文件并刷新浏览器即可看到新内容**，无需重新打包或重启应用。浏览器自动刷新可以作为开发便利功能。
 - 开发启动入口优先直接读取实际的模板和静态资源源码目录。采用 Thymeleaf 时，关闭 dev 的模板缓存，并配置静态资源的开发缓存策略，使下一次页面请求可以取到最新资源。
@@ -52,4 +52,8 @@ POM 沿用[通用配置组织规则](<10-10 通用开发规范.md#24-配置与�
 - 验证实际 Maven 编译是否生成所需方法。涉及打包时检查最终 JAR 或 WAR。Spring Boot 重打包可能纳入 `provided` 依赖，使用相应排除项，确保 Lombok 留在编译期。
 - 源码中的注解用法见 [Java 的 Lombok 约定](<30-10 Java 通用代码规范.md#41-使用-lombok-减少重复代码>)。配置细节见 [Lombok Maven 说明](https://projectlombok.org/setup/maven)及 [Spring Boot 打包说明](https://docs.spring.io/spring-boot/maven-plugin/packaging.html)。
 
-参考 [Maven Build Profiles](https://maven.apache.org/guides/introduction/introduction-to-profiles.html)、[Spring Boot Profiles](https://docs.spring.io/spring-boot/reference/features/profiles.html) 和 [Spring Boot Maven 插件运行选项](https://docs.spring.io/spring-boot/maven-plugin/run.html)。
+## 4. 参考资料
+
+- [Maven Build Profiles](https://maven.apache.org/guides/introduction/introduction-to-profiles.html)
+- [Spring Boot Profiles](https://docs.spring.io/spring-boot/reference/features/profiles.html)
+- [Spring Boot Maven 插件运行选项](https://docs.spring.io/spring-boot/maven-plugin/run.html)
